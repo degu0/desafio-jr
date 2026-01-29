@@ -6,6 +6,11 @@ import { HiOutlinePlusCircle } from "react-icons/hi";
 import { SearchBar } from "../../components/SearchBar";
 
 export function Home() {
+  const [modalRegisterConfig, setModalRegisterConfig] = useState({
+    isOpen: false,
+    type: "Register" as "Edit" | "Remove" | "Register",
+  });
+
   const [modalEditConfig, setModalEditConfig] = useState({
     isOpen: false,
     type: "Edit" as "Edit" | "Remove" | "Register",
@@ -31,7 +36,10 @@ export function Home() {
         <div className="w-[13%]">
           <button
             className="w-full flex-1 bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
-            rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2"
+            rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
+            onClick={() =>
+              setModalRegisterConfig({ ...modalRegisterConfig, isOpen: true })
+            }
           >
             <HiOutlinePlusCircle />
             Cadastrar
@@ -49,6 +57,14 @@ export function Home() {
         onEdit={() => setModalEditConfig({ ...modalEditConfig, isOpen: true })}
         onRemove={() =>
           setModalRemoveConfig({ ...modalRemoveConfig, isOpen: true })
+        }
+      />
+
+      <Modal
+        type={modalRegisterConfig.type}
+        isOpen={modalRegisterConfig.isOpen}
+        onClose={() =>
+          setModalRegisterConfig({ ...modalRegisterConfig, isOpen: false })
         }
       />
 
