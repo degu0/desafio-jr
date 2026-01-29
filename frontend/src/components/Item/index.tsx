@@ -18,8 +18,8 @@ type ItemProps = {
   petRace: string;
   ownerTelefone: string;
   petDateOfBirth: Date;
-  onEdit?: () => void;
-  onRemove?: () => void;
+  onEdit: () => void;
+  onRemove: () => void;
 };
 
 export const Item: React.FC<ItemProps> = ({
@@ -144,7 +144,7 @@ export const Item: React.FC<ItemProps> = ({
                 onEdit?.();
               }}
               className="bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg 
-                hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2"
+                hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <FaRegEdit className="text-xl" />
               Editar
@@ -156,7 +156,7 @@ export const Item: React.FC<ItemProps> = ({
                 onRemove?.();
               }}
               className="bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 px-4 rounded-lg 
-               transition-colors duration-200 flex items-center justify-center gap-2"
+               transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <MdDelete className="text-xl" />
               Remover
