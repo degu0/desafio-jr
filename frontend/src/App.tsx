@@ -1,5 +1,10 @@
-function App() {
-  return <h1 className="text-6xl font-bold underline">Hello world!</h1>;
-}
+import { BrowserRouter } from "react-router-dom";
+import { AppRouter } from "./routes";
 
-export default App;
+export function App() {
+  return(
+    <BrowserRouter>
+      <AppRouter />
+    </BrowserRouter>
+  )
+}
