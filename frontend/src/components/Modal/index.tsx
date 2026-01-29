@@ -99,8 +99,8 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
             </label>
             <div className="flex gap-4 text-sm">
               <label
-                className="flex-1 flex items-center gap-2 text-white cursor-pointer border-2 border-gray-700 
-              hover:border-white has-[:checked]:border-white rounded-lg p-3 transition-all duration-200"
+                className="flex-1 flex items-center gap-2 text-gray-600 cursor-pointer border-2 border-gray-700 
+              hover:border-white has-[:checked]:border-white has-[:checked]:text-white rounded-lg p-3 transition-all duration-200"
               >
                 <input
                   type="radio"
@@ -112,8 +112,8 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
               </label>
 
               <label
-                className="flex-1 flex items-center gap-2 text-white cursor-pointer border-2 border-gray-700 
-              hover:border-white has-[:checked]:border-white rounded-lg p-3 transition-all duration-200"
+                className="flex-1 flex items-center text-gray-600 gap-2 cursor-pointer border-2 border-gray-700 
+              hover:border-white has-[:checked]:border-white has-[:checked]:text-white rounded-lg p-3 transition-all duration-200"
               >
                 <input
                   type="radio"
