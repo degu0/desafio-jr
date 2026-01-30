@@ -8,10 +8,12 @@ import {
   IoArrowBackCircleOutline,
   IoArrowForwardCircleOutline,
 } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const [modalRegisterConfig, setModalRegisterConfig] = useState({
     isOpen: false,
@@ -182,7 +184,7 @@ export function Home() {
     <div className="flex flex-col gap-8 min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D] p-12">
       <div className="flex items-center justify-between text-white text-3xl">
         <h1>SoftPet</h1>
-        <button>
+        <button onClick={() => navigate("/login")}>
           <MdLogout />
         </button>
       </div>
