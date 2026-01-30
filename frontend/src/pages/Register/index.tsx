@@ -1,13 +1,27 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 
-export function Login() {
+export function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmationPassword, setConfirmationPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login:", { username, password });
+    setError("");
+
+    if (password !== confirmationPassword) {
+      setError("As senhas não coincidem!");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("A senha deve ter no mínimo 6 caracteres!");
+      return;
+    }
+
+    console.log("Cadastro:", { username, password });
   };
 
   return (
@@ -18,9 +32,10 @@ export function Login() {
       >
         <div className="text-center mb-4">
           <h1 className="text-white text-4xl font-bold mb-2">SoftPet</h1>
-          <p className="text-gray-400 text-sm">Faça login para continuar</p>
+          <p className="text-gray-400 text-sm">Faça o cadastro para continuar</p>
         </div>
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+
+        <form onSubmit={handleRegister} className="flex flex-col gap-5">
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
               <FaUser className="text-blue-400 text-lg" />
@@ -34,8 +49,10 @@ export function Login() {
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
+              minLength={3}
             />
           </div>
+
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
               <FaLock className="text-blue-400 text-lg" />
@@ -45,33 +62,50 @@ export function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Digite sua senha"
+              placeholder="Digite sua senha (mín. 6 caracteres)"
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
+              minLength={6}
             />
           </div>
-          <div className="text-right">
-            <a
-              href="#"
-              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-            >
-              Esqueceu a senha?
-            </a>
+
+          <div>
+            <label className="flex items-center gap-2 text-white mb-2">
+              <FaLock className="text-blue-400 text-lg" />
+              <span className="font-medium">Confirme a senha</span>
+            </label>
+            <input
+              type="password"
+              value={confirmationPassword}
+              onChange={(e) => setConfirmationPassword(e.target.value)}
+              placeholder="Confirme sua senha"
+              className={`w-full bg-slate-900/50 border-2 ${
+                error ? "border-red-500" : "border-gray-700"
+              } focus:border-blue-500 focus:outline-none 
+                text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500`}
+              required
+            />
           </div>
+
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
               rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2"
           >
-            Entrar
+            Cadastrar
           </button>
 
           <div className="text-center text-gray-400 text-sm mt-2">
-            Não tem uma conta?{" "}
-            <a href="/Cadastro" className="text-blue-400 hover:text-blue-300 transition-colors">
-              Cadastre-se
+            Já tem uma conta?{" "}
+            <a href="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
+              Faça login
             </a>
           </div>
         </form>
