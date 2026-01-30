@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login:", { username, password });
+    navigate("/");
   };
 
   return (
@@ -51,19 +54,11 @@ export function Login() {
               required
             />
           </div>
-          <div className="text-right">
-            <a
-              href="#"
-              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-            >
-              Esqueceu a senha?
-            </a>
-          </div>
 
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
-              rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2"
+              rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2 cursor-pointer"
           >
             Entrar
           </button>
