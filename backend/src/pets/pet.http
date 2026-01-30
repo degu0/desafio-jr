@@ -1,0 +1,163 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIzNGRiMzM4NS1iMThjLTRmYjgtOGQ3OS0zOGQ5NGVkZTJkZmYiLCJpYXQiOjE3Njk4MTAwMTcsImV4cCI6MTc2OTg5NjQxN30.eiA1zuU0s7T_3V2EAVBzZ4bU1eydR_RZipZ_aKLmKa4
+@petId = 731f77a5-6fc6-4a26-bd16-cf7811475baf
+@ownerId = 7cf2adf6-7f44-4741-b5b8-2f925ccbee6d
+
+### ====================================
+### PETS - CRUD Completo
+### ====================================
+
+### Criar Pet (Cachorro)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet (Gato)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Mimi",
+  "type": "GATO",
+  "race": "Persa",
+  "dateOfBirth": "2021-03-20",
+  "ownerId": "{{ownerId}}"
+}
+
+
+### Listar todos os Pets
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### Listar Pets de um Owner específico
+GET {{baseUrl}}/pets?ownerId={{ownerId}}
+Authorization: Bearer {{token}}
+
+### Buscar Pet por ID
+GET {{baseUrl}}/pets/{{petId}}
+Authorization: Bearer {{token}}
+
+### Atualizar Pet completo
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex Atualizado",
+  "type": "CACHORRO",
+  "race": "Labrador",
+  "dateOfBirth": "2020-05-15"
+}
+
+### Atualizar apenas o nome
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex Jr."
+}
+
+### Atualizar apenas a raça
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "race": "Vira-lata"
+}
+
+### Transferir Pet para outro Owner
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ownerId": "9332bf71-9226-4350-af04-7620d988b9bd"
+}
+
+### Deletar Pet
+DELETE {{baseUrl}}/pets/{{petId}}
+Authorization: Bearer {{token}}
+
+### ====================================
+### TESTES DE VALIDAÇÃO
+### ====================================
+
+### Criar Pet - Tipo inválido (deve falhar) v
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "DINOSSAURO",
+  "race": "T-Rex",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - Data inválida (deve falhar) v
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "data-invalida",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - Owner inexistente (deve falhar) v
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "00000000-0000-0000-0000-000000000000"
+}
+
+### Criar Pet - Sem nome (deve falhar) v
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - UUID inválido (deve falhar) v
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "id-invalido-123"
+}
+
+### Buscar Pet inexistente (deve retornar 404) v
+GET {{baseUrl}}/pets/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}

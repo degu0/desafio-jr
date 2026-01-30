@@ -17,6 +17,16 @@ Authorization: Bearer {{token}}
   "telefone": "(81) 99999-9999"
 }
 
+### Criar outro Owner
+POST {{baseUrl}}/owner
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Maria silva",
+  "telefone": "(81) 99999-9999"
+}
+
 
 ### Buscar Owner por ID
 GET {{baseUrl}}/owner/{{ownerId}}
