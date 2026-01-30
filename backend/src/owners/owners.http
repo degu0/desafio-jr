@@ -1,0 +1,101 @@
+### Variáveis
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIzNGRiMzM4NS1iMThjLTRmYjgtOGQ3OS0zOGQ5NGVkZTJkZmYiLCJpYXQiOjE3Njk4MDg3OTcsImV4cCI6MTc2OTg5NTE5N30.GJhduwbLsIlV1zbAS0zB0v9En9t8VmLiD7EPnAOR-1g
+@ownerId = 39758640-217d-423e-b23b-d41c16c8bdaf
+
+### ====================================
+### OWNERS - CRUD Completo
+### ====================================
+
+### Criar Owner
+POST {{baseUrl}}/owner
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "João Silva",
+  "telefone": "(81) 99999-9999"
+}
+
+
+### Buscar Owner por ID
+GET {{baseUrl}}/owner/{{ownerId}}
+Authorization: Bearer {{token}}
+
+### Atualizar Owner
+PATCH {{baseUrl}}/owner/{{ownerId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "João Silva Atualizado",
+  "telefone": "(81) 97777-7777"
+}
+
+### Atualizar apenas o nome
+PATCH {{baseUrl}}/owner/{{ownerId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "João Pedro Silva"
+}
+
+### Atualizar apenas o telefone
+PATCH {{baseUrl}}/owner/{{ownerId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "telefone": "(81) 96666-6666"
+}
+
+### Deletar Owner
+DELETE {{baseUrl}}/owner/{{ownerId}}
+Authorization: Bearer {{token}}
+
+### ====================================
+### TESTES DE VALIDAÇÃO
+### ====================================
+
+### Criar Owner - Nome vazio (deve falhar)
+POST {{baseUrl}}/owner
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "",
+  "telefone": "(81) 99999-9999"
+}
+
+### Criar Owner - Telefone inválido (deve falhar)
+POST {{baseUrl}}/owner
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste",
+  "telefone": "123"
+}
+
+### Criar Owner - Sem telefone (deve falhar) V
+POST {{baseUrl}}/owner
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste Sem Telefone"
+}
+
+### Criar Owner - Sem autenticação (deve falhar 401) V
+POST {{baseUrl}}/owner
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "telefone": "(81) 99999-9999"
+}
+
+### Buscar Owner inexistente (deve retornar 404) V
+GET {{baseUrl}}/owner/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
