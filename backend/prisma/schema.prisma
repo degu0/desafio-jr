@@ -24,8 +24,8 @@ model User {
 model Owner {
   id        String   @id @default(uuid())
   name      String
-  telefone  String   // Mudei para String (telefone pode ter caracteres)
-  pets      Pet[]    // Relação: um Owner tem vários Pets
+  telefone  String   
+  pets      Pet[]    
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -33,10 +33,10 @@ model Owner {
 model Pet {
   id          String   @id @default(uuid())
   name        String
-  type        PetType  // Usa o enum definido acima
+  type        PetType  
   race        String
   dateOfBirth DateTime
-  ownerId     String   // Mudei para String (UUID do Owner)
+  ownerId     String  
   owner       Owner    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
