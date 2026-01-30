@@ -4,10 +4,15 @@ import { Modal } from "../../components/Modal";
 import { MdLogout } from "react-icons/md";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { SearchBar } from "../../components/SearchBar";
-import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import {
+  IoArrowBackCircleOutline,
+  IoArrowForwardCircleOutline,
+} from "react-icons/io5";
 
 export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [modalRegisterConfig, setModalRegisterConfig] = useState({
     isOpen: false,
     type: "Register" as "Edit" | "Remove" | "Register",
@@ -144,11 +149,26 @@ export function Home() {
     },
   ];
 
+  const filteredPets = pets.filter((pet) => {
+    const searchLower = searchTerm.toLowerCase();
+    const petNameMatch = pet.petName.toLowerCase().includes(searchLower);
+    const ownerNameMatch = pet.ownerName
+      .toLocaleLowerCase()
+      .includes(searchLower);
+
+    return petNameMatch || ownerNameMatch;
+  });
+
   const itemsPerPage = 12;
-  const totalPages = Math.ceil(pets.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentPets = pets.slice(startIndex, endIndex);
+  const currentPets = filteredPets.slice(startIndex, endIndex);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -169,7 +189,7 @@ export function Home() {
 
       <div className="flex items-center justify-between gap-5">
         <div className="w-[90%]">
-          <SearchBar placeholder="Pesquisar pets..." />
+          <SearchBar placeholder="Pesquisar pets..." onSearch={handleSearch} />
         </div>
         <div className="w-[13%]">
           <button
@@ -186,67 +206,58 @@ export function Home() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {currentPets.map((pet, index) => (
-          <Item
-            key={index}
-            typeAnimal={pet.typeAnimal}
-            petName={pet.petName}
-            ownerName={pet.ownerName}
-            petRace={pet.petRace}
-            ownerTelefone={pet.ownerTelefone}
-            petDateOfBirth={pet.petDateOfBirth}
-            onEdit={() =>
-              setModalEditConfig({ ...modalEditConfig, isOpen: true })
-            }
-            onRemove={() =>
-              setModalRemoveConfig({ ...modalRemoveConfig, isOpen: true })
-            }
-          />
-        ))}
+        {currentPets.length > 0 ? (
+          currentPets.map((pet, index) => (
+            <Item
+              key={index}
+              typeAnimal={pet.typeAnimal}
+              petName={pet.petName}
+              ownerName={pet.ownerName}
+              petRace={pet.petRace}
+              ownerTelefone={pet.ownerTelefone}
+              petDateOfBirth={pet.petDateOfBirth}
+              onEdit={() =>
+                setModalEditConfig({ ...modalEditConfig, isOpen: true })
+              }
+              onRemove={() =>
+                setModalRemoveConfig({ ...modalRemoveConfig, isOpen: true })
+              }
+            />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-400 text-xl">
+              Nenhum pet encontrado para "{searchTerm}"
+            </p>
+          </div>
+        )}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-4">
+        <div className="flex items-center justify-end gap-4 mt-4">
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 disabled:opacity-50 
-              text-white p-3 rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
+            className="text-white cursor-pointer disabled:text-gray-600 disabled:cursor-not-allowed"
           >
-            <IoChevronBack className="text-xl" />
+            <IoArrowBackCircleOutline className="text-2xl" />
           </button>
 
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-10 h-10 rounded-lg font-semibold transition-all duration-200 ${
-                  currentPage === page
-                    ? "bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white"
-                    : "bg-slate-800 hover:bg-slate-700 text-white"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 text-white">
+            <span>
+              {currentPage} de {totalPages}
+            </span>
           </div>
 
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 disabled:opacity-50 
-              text-white p-3 rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
+            className="text-white cursor-pointer disabled:text-gray-600 disabled:cursor-not-allowed"
           >
-            <IoChevronForward className="text-xl" />
+            <IoArrowForwardCircleOutline className="text-xl" />
           </button>
         </div>
       )}
-
-      <div className="text-center text-gray-400 text-sm">
-        Mostrando {startIndex + 1} - {Math.min(endIndex, pets.length)} de{" "}
-        {pets.length} pets
-      </div>
 
       <Modal
         type={modalRegisterConfig.type}

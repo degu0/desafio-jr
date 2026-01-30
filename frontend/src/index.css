@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+  font-family: 'Ubuntu', sans-serif;
+}
+
 input[type="radio"] {
   appearance: none;
   width: 1rem;
