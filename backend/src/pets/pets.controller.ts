@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Request,
 } from '@nestjs/common';
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
@@ -20,8 +21,9 @@ export class PetsController {
   constructor(private readonly petsService: PetsService) {}
 
   @Post()
-  create(@Body() createPetDto: CreatePetDto) {
-    return this.petsService.create(createPetDto);
+  create(@Body() createPetDto: CreatePetDto, @Request() req) {
+    const userId = req.user.userId;
+    return this.petsService.create(createPetDto, userId);
   }
 
   @Get()
@@ -38,12 +40,18 @@ export class PetsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePetDto: UpdatePetDto) {
-    return this.petsService.update(id, updatePetDto);
+  update(
+    @Param('id') id: string,
+    @Body() updatePetDto: UpdatePetDto,
+    @Request() req,
+  ) {
+    const userId = req.user.userId;
+    return this.petsService.update(id, updatePetDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.petsService.remove(id);
+  remove(@Param('id') id: string, @Request() req) {
+    const userId = req.user.userId;
+    return this.petsService.remove(id, userId);
   }
 }

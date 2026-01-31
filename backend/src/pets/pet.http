@@ -1,8 +1,9 @@
 ### Variáveis
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIzNGRiMzM4NS1iMThjLTRmYjgtOGQ3OS0zOGQ5NGVkZTJkZmYiLCJpYXQiOjE3Njk4MTAwMTcsImV4cCI6MTc2OTg5NjQxN30.eiA1zuU0s7T_3V2EAVBzZ4bU1eydR_RZipZ_aKLmKa4
-@petId = 731f77a5-6fc6-4a26-bd16-cf7811475baf
-@ownerId = 7cf2adf6-7f44-4741-b5b8-2f925ccbee6d
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIwODZjZDk1YS1mZTRjLTRhMjUtOTMwNS1iM2ZlMTNjYzg3MTIiLCJpYXQiOjE3Njk4NzIxMTksImV4cCI6MTc2OTk1ODUxOX0.j5qU1NnuelfOx9tZHRO9pmXuUxo-rakrCsRDOOwDLec
+@token-outro-usuario = 
+@petId = ab8c8b49-edf0-4217-a585-697c0195eefb
+@ownerId = 6e32e16d-e1b9-45c1-bdde-e765cb7cd829
 
 ### ====================================
 ### PETS - CRUD Completo
@@ -33,7 +34,6 @@ Authorization: Bearer {{token}}
   "dateOfBirth": "2021-03-20",
   "ownerId": "{{ownerId}}"
 }
-
 
 ### Listar todos os Pets
 GET {{baseUrl}}/pets
@@ -77,6 +77,15 @@ Authorization: Bearer {{token}}
   "race": "Vira-lata"
 }
 
+### Atualizar apenas o tipo
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "type": "GATO"
+}
+
 ### Transferir Pet para outro Owner
 PATCH {{baseUrl}}/pets/{{petId}}
 Content-Type: application/json
@@ -94,7 +103,7 @@ Authorization: Bearer {{token}}
 ### TESTES DE VALIDAÇÃO
 ### ====================================
 
-### Criar Pet - Tipo inválido (deve falhar) v
+### Criar Pet - Tipo inválido (deve falhar - 400)
 POST {{baseUrl}}/pets
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -107,7 +116,7 @@ Authorization: Bearer {{token}}
   "ownerId": "{{ownerId}}"
 }
 
-### Criar Pet - Data inválida (deve falhar) v
+### Criar Pet - Data inválida (deve falhar - 400)
 POST {{baseUrl}}/pets
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -120,7 +129,7 @@ Authorization: Bearer {{token}}
   "ownerId": "{{ownerId}}"
 }
 
-### Criar Pet - Owner inexistente (deve falhar) v
+### Criar Pet - Owner inexistente (deve falhar - 404)
 POST {{baseUrl}}/pets
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -133,7 +142,7 @@ Authorization: Bearer {{token}}
   "ownerId": "00000000-0000-0000-0000-000000000000"
 }
 
-### Criar Pet - Sem nome (deve falhar) v
+### Criar Pet - Sem nome (deve falhar - 400)
 POST {{baseUrl}}/pets
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -145,7 +154,7 @@ Authorization: Bearer {{token}}
   "ownerId": "{{ownerId}}"
 }
 
-### Criar Pet - UUID inválido (deve falhar) v
+### Criar Pet - UUID inválido (deve falhar - 400)
 POST {{baseUrl}}/pets
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -158,6 +167,110 @@ Authorization: Bearer {{token}}
   "ownerId": "id-invalido-123"
 }
 
-### Buscar Pet inexistente (deve retornar 404) v
+### Criar Pet - Sem tipo (deve falhar - 400)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - Sem raça (deve falhar - 400)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - Sem data de nascimento (deve falhar - 400)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "ownerId": "{{ownerId}}"
+}
+
+### Criar Pet - Sem ownerId (deve falhar - 400)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15"
+}
+
+### Buscar Pet inexistente (deve retornar 404)
 GET {{baseUrl}}/pets/00000000-0000-0000-0000-000000000000
 Authorization: Bearer {{token}}
+
+### Atualizar Pet inexistente (deve retornar 404)
+PATCH {{baseUrl}}/pets/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste"
+}
+
+### Deletar Pet inexistente (deve retornar 404)
+DELETE {{baseUrl}}/pets/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### Criar Pet sem autenticação (deve falhar - 401)
+POST {{baseUrl}}/pets
+Content-Type: application/json
+
+{
+  "name": "Rex",
+  "type": "CACHORRO",
+  "race": "Golden Retriever",
+  "dateOfBirth": "2020-05-15",
+  "ownerId": "{{ownerId}}"
+}
+
+### ====================================
+### TESTES DE AUTORIZAÇÃO
+### ====================================
+
+### Criar Pet com usuário 1
+POST {{baseUrl}}/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Pet do Usuário 1",
+  "type": "CACHORRO",
+  "race": "Bulldog",
+  "dateOfBirth": "2022-03-10",
+  "ownerId": "{{ownerId}}"
+}
+
+### Copie o ID do pet criado acima e cole em {{petId}}
+### Faça login com outro usuário e tente atualizar (deve falhar - 401)
+PATCH {{baseUrl}}/pets/{{petId}}
+Content-Type: application/json
+Authorization: Bearer {{token-outro-usuario}}
+
+{
+  "name": "Tentando mudar"
+}
+
+### Faça login com outro usuário e tente deletar (deve falhar - 401)
+DELETE {{baseUrl}}/pets/{{petId}}
+Authorization: Bearer {{token-outro-usuario}}

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
@@ -7,7 +11,7 @@ import { UpdatePetDto } from './dto/update-pet.dto';
 export class PetsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createPetDto: CreatePetDto) {
+  async create(createPetDto: CreatePetDto, userId: string) {
     const ownerExists = await this.prisma.owner.findUnique({
       where: { id: createPetDto.ownerId },
     });
@@ -18,10 +22,19 @@ export class PetsService {
       );
     }
 
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
     return this.prisma.pet.create({
       data: {
         ...createPetDto,
         dateOfBirth: new Date(createPetDto.dateOfBirth),
+        createdById: userId,
       },
       include: {
         owner: true,
@@ -39,6 +52,13 @@ export class PetsService {
             telefone: true,
           },
         },
+        createdBy: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
       },
     });
   }
@@ -51,6 +71,13 @@ export class PetsService {
             id: true,
             name: true,
             telefone: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
           },
         },
       },
@@ -74,12 +101,27 @@ export class PetsService {
             telefone: true,
           },
         },
+        createdBy: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
       },
     });
   }
 
-  async update(id: string, updatePetDto: UpdatePetDto) {
+  async update(id: string, updatePetDto: UpdatePetDto, userId: string) {
     await this.findOne(id);
+
+    const pet = await this.findOne(id);
+
+    if (userId !== pet.createdById) {
+      throw new UnauthorizedException(
+        'You can only update pets that you created',
+      );
+    }
 
     if (updatePetDto.ownerId) {
       const ownerExists = await this.prisma.owner.findUnique({
@@ -99,6 +141,8 @@ export class PetsService {
       data.dateOfBirth = new Date(updatePetDto.dateOfBirth);
     }
 
+    delete data.createdById;
+
     return this.prisma.pet.update({
       where: { id },
       data,
@@ -110,12 +154,27 @@ export class PetsService {
             telefone: true,
           },
         },
+        createdBy: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
       },
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     await this.findOne(id);
+
+    const pet = await this.findOne(id);
+
+    if (userId !== pet.createdById) {
+      throw new UnauthorizedException(
+        'You can only update pets that you created',
+      );
+    }
 
     return this.prisma.pet.delete({
       where: { id },

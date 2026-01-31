@@ -1,6 +1,6 @@
 ### Variáveis
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIzNGRiMzM4NS1iMThjLTRmYjgtOGQ3OS0zOGQ5NGVkZTJkZmYiLCJpYXQiOjE3Njk4MDg3OTcsImV4cCI6MTc2OTg5NTE5N30.GJhduwbLsIlV1zbAS0zB0v9En9t8VmLiD7EPnAOR-1g
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BnbWFpbC5jb20iLCJzdWIiOiIwODZjZDk1YS1mZTRjLTRhMjUtOTMwNS1iM2ZlMTNjYzg3MTIiLCJpYXQiOjE3Njk4NzIxMTksImV4cCI6MTc2OTk1ODUxOX0.j5qU1NnuelfOx9tZHRO9pmXuUxo-rakrCsRDOOwDLec
 @ownerId = 39758640-217d-423e-b23b-d41c16c8bdaf
 
 ### ====================================

@@ -22,4 +22,8 @@ export class CreatePetDto {
   @IsUUID('4', { message: 'Owner ID must be a valid UUID' })
   @IsNotEmpty({ message: 'ownerId is required' })
   ownerId: string;
+
+  @IsUUID('4', { message: 'User ID must be a valid UUID' })
+  @IsNotEmpty({ message: 'userId is required' })
+  createdById: string;
 }
