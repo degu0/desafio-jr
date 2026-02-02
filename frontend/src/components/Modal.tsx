@@ -70,7 +70,7 @@ export const Modal: React.FC<ModalType> = ({
         if (!response.ok) throw new Error(`Erro ao buscar o animal`);
 
         const data = await response.json();
-        
+
         setForm({
           petName: data.name || "",
           ownerName: data.owner.name || "",
@@ -196,8 +196,12 @@ export const Modal: React.FC<ModalType> = ({
       if (!responsePet.ok) {
         throw new Error("Erro ao cadastrar pet");
       }
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      if (error.status === 401) {
+        alert("Sessão expirada. Faça login novamente.");
+      } else {
+        alert(error.message);
+      }
     }
   };
   const handleUpdatePet = async () => {
@@ -233,10 +237,16 @@ export const Modal: React.FC<ModalType> = ({
       });
 
       if (!responsePet.ok) {
-        throw new Error("Erro ao atualizar pet");
+        throw new Error(
+          "Você não cadastrou esse pet, então não tem permissão para altualiza-lo",
+        );
       }
-    } catch (error) {
-      console.error("Erro ao atualizar o pet:", error);
+    } catch (error: any) {
+      if (error.status === 401) {
+        alert("Sessão expirada. Faça login novamente.");
+      } else {
+        alert(error.message);
+      }
     }
   };
 
@@ -251,10 +261,16 @@ export const Modal: React.FC<ModalType> = ({
       });
 
       if (!responsePet.ok) {
-        throw new Error("Erro ao deletar pet");
+        throw new Error(
+          "Você não cadastrou esse pet, então não tem permissão para deletar-lo",
+        );
       }
-    } catch (error) {
-      console.error("Erro ao deletar o pet:", error);
+    } catch (error: any) {
+      if (error.status === 401) {
+        alert("Sessão expirada. Faça login novamente.");
+      } else {
+        alert(error.message);
+      }
     }
   };
 
