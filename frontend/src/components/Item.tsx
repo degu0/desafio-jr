@@ -65,15 +65,16 @@ export const Item: React.FC<ItemProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col items-center gap-3">
       <div
-        className="bg-linear-155 from-[#001E4D] from-15% to-[#0E0014] to-85% flex flex-row items-center gap-4 max-w-sm rounded-xl text-white
+        className="w-full bg-linear-155 from-[#001E4D] from-15% to-[#0E0014] to-85% flex flex-row items-center gap-4 
+          max-w-sm rounded-xl text-white
           p-4 cursor-pointer transition-all duration-100 
           hover:border-5 hover:border-[#0056E2]
           hover:shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02]"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="bg-gradient-to-r from-[#00CAFC] to-[#0056E2] flex items-center rounded-full px-2.5 py-3">
+        <div className="bg-linear-to-r from-[#00CAFC] to-[#0056E2] flex items-center rounded-full px-2.5 py-3">
           <img
             src={typeAnimal === "cat" ? cat : dog}
             alt="Pet icon"
@@ -100,7 +101,7 @@ export const Item: React.FC<ItemProps> = ({
       </div>
 
       <div
-        className={`overflow-hidden transition-all duration-300 ${
+        className={`overflow-hidden transition-all duration-300 w-full  ${
           isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -155,7 +156,7 @@ export const Item: React.FC<ItemProps> = ({
                 e.stopPropagation();
                 onRemove?.();
               }}
-              className="bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 px-4 rounded-lg 
+              className="bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 px-4 rounded-lg 
                transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <MdDelete className="text-xl" />

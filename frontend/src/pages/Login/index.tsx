@@ -28,9 +28,9 @@ export function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D] p-6">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-tr from-[#0E0014] to-[#001E4D] p-6">
       <div
-        className="flex flex-col gap-6 bg-gradient-to-br from-[#0E0014] to-[#001E4D] border-2 border-blue-500/50 rounded-xl 
+        className="flex flex-col gap-6 bg-linear-to-br from-[#0E0014] to-[#001E4D] border-2 border-blue-500/50 rounded-xl 
         shadow-2xl shadow-blue-500/20 w-full max-w-md p-8 animate-scaleIn"
       >
         <div className="text-center mb-4">
@@ -79,7 +79,7 @@ export function Login() {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
+            className="w-full bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
               rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2 cursor-pointer"
           >
             Entrar

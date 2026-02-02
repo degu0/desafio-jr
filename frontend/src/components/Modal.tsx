@@ -9,9 +9,16 @@ type ModalType = {
   type: "Edit" | "Remove" | "Register";
   isOpen: boolean;
   onClose: () => void;
+  idPet?: string;
 };
 
-export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
+export const Modal: React.FC<ModalType> = ({
+  type,
+  isOpen,
+  onClose,
+  idPet,
+}) => {
+  const token = localStorage.getItem("@softpet:token");
   const [form, setForm] = useState({
     petName: "",
     ownerName: "",
@@ -21,6 +28,37 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
     animal: "",
   });
   const isReadOnly = type === "Remove";
+
+  useEffect(() => {
+    if (!idPet || type === "Register") return;
+
+    async function fetchPet() {
+      try {
+        const response = await fetch(`http://localhost:3000/pets/${idPet}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error(`Erro ao buscar o animal`);
+
+        const data = await response.json();
+        setForm({
+          petName: data.name || "",
+          ownerName: data.owner.name || "",
+          race: data.race || "",
+          phone: data.owner.telefone || "",
+          dateOfBirth: data.dateOfBirth || "",
+          animal: data.type || "",
+        });
+      } catch (error) {
+        console.error("Erro ao buscar pets:", error);
+      }
+    }
+
+    fetchPet();
+  }, [idPet, token, type]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -73,24 +111,118 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(form);
+  const handleSubmit = () => {
+    if(type === "Register") {
+      handleRegisterPet();
+    }else if(type === "Edit") {
+      handleUpdatePet();
+    }else if(type === "Remove") {
+      handleRemovePet();
+    }
+  };
+
+  const handleRegisterPet = async () => {
+    try {
+      const responseOwner = await fetch("http://localhost:3000/owner", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: form.ownerName, telefone: form.phone }),
+      });
+
+      const dataOwner = await responseOwner.json();
+
+      const reponsePet = await fetch("http://localhost:3000/pets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: form.petName,
+          type: form.animal,
+          race: form.race,
+          dateOfBirth: form.dateOfBirth,
+          ownerId: dataOwner.id,
+        }),
+      });
+
+      const dataPet = await reponsePet.json();
+
+      console.log(dataPet);
+    } catch (error) {
+      console.error("Erro ao cadastrar o pet:", error);
+    }
+  };
+  const handleUpdatePet = async () => {
+    try {
+      const responseOwner = await fetch("http://localhost:3000/owner", {
+        method: "PACTH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: form.ownerName, telefone: form.phone }),
+      });
+
+      const dataOwner = await responseOwner.json();
+
+      const reponsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
+        method: "PACTH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: form.petName,
+          type: form.animal,
+          race: form.race,
+          dateOfBirth: form.dateOfBirth,
+          ownerId: dataOwner.id,
+        }),
+      });
+
+      const dataPet = await reponsePet.json();
+
+      console.log(dataPet);
+    } catch (error) {
+      console.error("Erro ao cadastrar o pet:", error);
+    }
+  };
+
+  const handleRemovePet = async () => {
+    try {
+      const reponsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      });
+
+      const dataPet = await reponsePet.json();
+
+      console.log(dataPet);
+    } catch (error) {
+      console.error("Erro ao deletar o pet:", error);
+    }
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
     >
       <div
-        className="relative bg-gradient-to-br from-[#0E0014] to-[#001E4D] border-2 border-blue-500/50 rounded-lg 
-        shadow-2xl shadow-blue-500/20 w-full max-w-2xl p-10 animate-scaleIn"
+        className="w-screen sm:w-full relative bg-linear-to-br from-[#0E0014] to-[#001E4D] sm:border-2 sm:border-blue-500/50   rounded-lg 
+        shadow-2xl shadow-blue-500/20 max-w-2xl p-10 animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3 text-white">
-            <div className="bg-gradient-to-r from-[#00CAFC] to-[#0056E2] flex items-center rounded-full p-4 text-3xl">
+            <div className="bg-linear-to-r from-[#00CAFC] to-[#0056E2] flex items-center rounded-full p-4 text-3xl">
               {getModalIcon()}
             </div>
             <h2 className="text-xl font-semibold">{getModalTitle()}</h2>
@@ -104,7 +236,7 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="p-5 space-y-4 grid grid-cols-2 gap-x-5 gap-y-2 ">
+          <div className="p-5 space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2 ">
             <Input
               label={"Nome"}
               placeholder={"Nome Sobrenome"}
@@ -124,13 +256,13 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
               <div className="flex gap-4 text-sm">
                 <label
                   className="flex-1 flex items-center gap-2 text-gray-600 cursor-pointer border-2 border-gray-700 
-              hover:border-white has-[:checked]:border-white has-[:checked]:text-white rounded-lg p-3 transition-all duration-200"
+              hover:border-white has-checked:border-white has-checked:text-white rounded-lg p-3 transition-all duration-200"
                 >
                   <input
                     type="radio"
                     name="animal"
-                    value="dog"
-                    checked={form.animal === "dog"}
+                    value="cachorro"
+                    checked={form.animal === "cachorro"}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, animal: e.target.value }))
                     }
@@ -142,13 +274,13 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
 
                 <label
                   className="flex-1 flex items-center text-gray-600 gap-2 cursor-pointer border-2 border-gray-700 
-              hover:border-white has-[:checked]:border-white has-[:checked]:text-white rounded-lg p-3 transition-all duration-200"
+              hover:border-white has-checked:border-white has-checked:text-white rounded-lg p-3 transition-all duration-200"
                 >
                   <input
                     type="radio"
                     name="animal"
-                    value="cat"
-                    checked={form.animal === "cat"}
+                    value="gato"
+                    checked={form.animal === "gato"}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, animal: e.target.value }))
                     }
@@ -212,11 +344,11 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
             </div>
           )}
 
-          <div className="flex items-center gap-3 p-5">
+          <div className="flex flex-col sm:flex-row items-center gap-3 p-5">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity 
+              className="w-full flex-1 bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity 
             duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <FiArrowLeftCircle className="text-xl" />
@@ -226,7 +358,7 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
             {type === "Edit" && (
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white  font-semibold py-3 
+                className="w-full flex-1 bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white  font-semibold py-3 
             px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <FaRegEdit className="text-xl" />
@@ -237,7 +369,7 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
             {type === "Register" && (
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
+                className="w-full flex-1 bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
             px-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MdPersonAdd className="text-xl" />
@@ -248,7 +380,7 @@ export const Modal: React.FC<ModalType> = ({ type, isOpen, onClose }) => {
             {type === "Remove" && (
               <button
                 type="submit"
-                className="flex-1 bg-red-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-600 
+                className="w-full flex-1 bg-red-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-600 
             transition-colors duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MdDelete className="text-xl" />

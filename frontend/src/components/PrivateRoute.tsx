@@ -11,7 +11,7 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D]">
+      <div className="flex items-center justify-center min-h-screen bg-linear-to-tr from-[#0E0014] to-[#001E4D]">
         <div className="text-white text-2xl">Carregando...</div>
       </div>
     );

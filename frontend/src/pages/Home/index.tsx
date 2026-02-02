@@ -41,10 +41,12 @@ export function Home() {
   const [modalEditConfig, setModalEditConfig] = useState({
     isOpen: false,
     type: "Edit" as "Edit" | "Remove" | "Register",
+    idPet: "",
   });
   const [modalRemoveConfig, setModalRemoveConfig] = useState({
     isOpen: false,
     type: "Remove" as "Edit" | "Remove" | "Register",
+    idPet: "",
   });
 
   useEffect(() => {
@@ -116,14 +118,14 @@ export function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D]">
+      <div className="flex items-center justify-center min-h-screen bg-linear-to-tr from-[#0E0014] to-[#001E4D]">
         <p className="text-white text-2xl">Carregando pets...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8 min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D] p-12">
+    <div className="flex flex-col gap-8 min-h-screen bg-linear-to-tr from-[#0E0014] to-[#001E4D] p-12">
       <div className="flex items-center justify-between text-white text-3xl">
         <h1>SoftPet</h1>
         <button onClick={() => handleLogout()} className="cursor-pointer">
@@ -137,34 +139,44 @@ export function Home() {
         </div>
         <div className="w-[13%]">
           <button
-            className="w-full flex-1 bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
+            className="w-full flex-1 bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
             rounded-lg hover:opacity-90 transition-opacity duration-200 flex items-center justify-center gap-2 cursor-pointer"
             onClick={() =>
               setModalRegisterConfig({ ...modalRegisterConfig, isOpen: true })
             }
           >
-            <HiOutlinePlusCircle />
-            Cadastrar
+            <span className="sm:hidden lg:block">
+              <HiOutlinePlusCircle />
+            </span>
+            <span className="hidden sm:block">Cadastrar</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {currentPets.length > 0 ? (
           currentPets.map((pet) => (
             <Item
-              key={pet.id} 
+              key={pet.id}
               typeAnimal={pet.typeAnimal}
-              petName={pet.name} 
-              ownerName={pet.owner.name} 
-              petRace={pet.race} 
-              ownerTelefone={pet.owner.telefone} 
+              petName={pet.name}
+              ownerName={pet.owner.name}
+              petRace={pet.race}
+              ownerTelefone={pet.owner.telefone}
               petDateOfBirth={new Date(pet.birthDate)}
               onEdit={() =>
-                setModalEditConfig({ ...modalEditConfig, isOpen: true })
+                setModalEditConfig({
+                  ...modalEditConfig,
+                  isOpen: true,
+                  idPet: pet.id,
+                })
               }
               onRemove={() =>
-                setModalRemoveConfig({ ...modalRemoveConfig, isOpen: true })
+                setModalRemoveConfig({
+                  ...modalRemoveConfig,
+                  isOpen: true,
+                  idPet: pet.id,
+                })
               }
             />
           ))
@@ -216,6 +228,7 @@ export function Home() {
         onClose={() =>
           setModalEditConfig({ ...modalEditConfig, isOpen: false })
         }
+        idPet={modalEditConfig.idPet}
       />
       <Modal
         type={modalRemoveConfig.type}
@@ -223,6 +236,7 @@ export function Home() {
         onClose={() =>
           setModalRemoveConfig({ ...modalRemoveConfig, isOpen: false })
         }
+        idPet={modalRemoveConfig.idPet}
       />
     </div>
   );
