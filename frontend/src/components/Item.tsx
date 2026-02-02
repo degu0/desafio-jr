@@ -12,7 +12,7 @@ import { BsTelephoneInbound } from "react-icons/bs";
 import { FaCalendarDay } from "react-icons/fa6";
 
 type ItemProps = {
-  typeAnimal: "cat" | "dog";
+  typeAnimal: "CAT" | "DOG";
   petName: string;
   ownerName: string;
   petRace: string;
@@ -76,7 +76,7 @@ export const Item: React.FC<ItemProps> = ({
       >
         <div className="bg-linear-to-r from-[#00CAFC] to-[#0056E2] flex items-center rounded-full px-2.5 py-3">
           <img
-            src={typeAnimal === "cat" ? cat : dog}
+            src={typeAnimal === "CAT" ? cat : dog}
             alt="Pet icon"
             className="w-9 h-8"
           />

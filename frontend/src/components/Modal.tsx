@@ -4,11 +4,18 @@ import { IoMdClose } from "react-icons/io";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { MdDelete, MdPersonAdd } from "react-icons/md";
 import { Input } from "./Input";
+import { formatDateForBackend, formatDateForInput } from "../utils/dateHelpers";
+import {
+  animalTypeMap,
+  formatAnimalTypeForBackend,
+  formatAnimalTypeFromBackend,
+} from "../utils/translations";
 
 type ModalType = {
   type: "Edit" | "Remove" | "Register";
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   idPet?: string;
 };
 
@@ -16,6 +23,7 @@ export const Modal: React.FC<ModalType> = ({
   type,
   isOpen,
   onClose,
+  onSuccess,
   idPet,
 }) => {
   const token = localStorage.getItem("@softpet:token");
@@ -26,8 +34,25 @@ export const Modal: React.FC<ModalType> = ({
     phone: "",
     dateOfBirth: "",
     animal: "",
+    ownerId: "",
   });
+  const [error, setError] = useState("");
   const isReadOnly = type === "Remove";
+
+  useEffect(() => {
+    if (isOpen && type === "Register") {
+      setForm({
+        petName: "",
+        ownerName: "",
+        race: "",
+        phone: "",
+        dateOfBirth: "",
+        animal: "",
+        ownerId: "",
+      });
+      setError("");
+    }
+  }, [isOpen, type]);
 
   useEffect(() => {
     if (!idPet || type === "Register") return;
@@ -44,16 +69,20 @@ export const Modal: React.FC<ModalType> = ({
         if (!response.ok) throw new Error(`Erro ao buscar o animal`);
 
         const data = await response.json();
+        console.log(data);
+        
         setForm({
           petName: data.name || "",
           ownerName: data.owner.name || "",
           race: data.race || "",
           phone: data.owner.telefone || "",
-          dateOfBirth: data.dateOfBirth || "",
-          animal: data.type || "",
+          dateOfBirth: formatDateForInput(data.dateOfBirth) || "",
+          animal: formatAnimalTypeFromBackend(data.type) || "",
+          ownerId: data.owner.id || "",
         });
       } catch (error) {
         console.error("Erro ao buscar pets:", error);
+        setError("Erro ao carregar dados do pet");
       }
     }
 
@@ -111,13 +140,24 @@ export const Modal: React.FC<ModalType> = ({
     }
   };
 
-  const handleSubmit = () => {
-    if(type === "Register") {
-      handleRegisterPet();
-    }else if(type === "Edit") {
-      handleUpdatePet();
-    }else if(type === "Remove") {
-      handleRemovePet();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      if (type === "Register") {
+        await handleRegisterPet();
+      } else if (type === "Edit") {
+        await handleUpdatePet();
+      } else if (type === "Remove") {
+        await handleRemovePet();
+      }
+
+      onClose();
+      onSuccess?.();
+    } catch (error) {
+      console.error("Erro na operação:", error);
+      setError(error instanceof Error ? error.message : "Erro desconhecido");
     }
   };
 
@@ -132,9 +172,13 @@ export const Modal: React.FC<ModalType> = ({
         body: JSON.stringify({ name: form.ownerName, telefone: form.phone }),
       });
 
+      if (!responseOwner.ok) {
+        throw new Error("Erro ao cadastrar dono");
+      }
+
       const dataOwner = await responseOwner.json();
 
-      const reponsePet = await fetch("http://localhost:3000/pets", {
+      const responsePet = await fetch("http://localhost:3000/pets", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -142,67 +186,81 @@ export const Modal: React.FC<ModalType> = ({
         },
         body: JSON.stringify({
           name: form.petName,
-          type: form.animal,
+          type: formatAnimalTypeForBackend(form.animal),
           race: form.race,
-          dateOfBirth: form.dateOfBirth,
+          dateOfBirth: formatDateForBackend(form.dateOfBirth),
           ownerId: dataOwner.id,
         }),
       });
 
-      const dataPet = await reponsePet.json();
+      if (!responsePet.ok) {
+        throw new Error("Erro ao cadastrar pet");
+      }
 
+      const dataPet = await responsePet.json();
       console.log(dataPet);
     } catch (error) {
-      console.error("Erro ao cadastrar o pet:", error);
+      throw error;
     }
   };
   const handleUpdatePet = async () => {
     try {
-      const responseOwner = await fetch("http://localhost:3000/owner", {
-        method: "PACTH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const responseOwner = await fetch(
+        `http://localhost:3000/owner/${form.ownerId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: form.ownerName, telefone: form.phone }),
         },
-        body: JSON.stringify({ name: form.ownerName, telefone: form.phone }),
-      });
+      );
 
-      const dataOwner = await responseOwner.json();
+      if (!responseOwner.ok) {
+        throw new Error("Erro ao atualizar dono");
+      }
 
-      const reponsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
-        method: "PACTH",
+      const responsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.petName,
-          type: form.animal,
+          type: formatAnimalTypeForBackend(form.animal),
           race: form.race,
           dateOfBirth: form.dateOfBirth,
-          ownerId: dataOwner.id,
         }),
       });
 
-      const dataPet = await reponsePet.json();
+      if (!responsePet.ok) {
+        throw new Error("Erro ao atualizar pet");
+      }
 
+      const dataPet = await responsePet.json();
       console.log(dataPet);
     } catch (error) {
-      console.error("Erro ao cadastrar o pet:", error);
+      console.error("Erro ao atualizar o pet:", error);
     }
   };
 
   const handleRemovePet = async () => {
     try {
-      const reponsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
+      const responsePet = await fetch(`http://localhost:3000/pets/${idPet}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
 
-      const dataPet = await reponsePet.json();
+      if (!responsePet.ok) {
+        throw new Error("Erro ao deletar pet");
+      }
+
+      const dataPet = await responsePet.json();
 
       console.log(dataPet);
     } catch (error) {
@@ -261,15 +319,16 @@ export const Modal: React.FC<ModalType> = ({
                   <input
                     type="radio"
                     name="animal"
-                    value="cachorro"
-                    checked={form.animal === "cachorro"}
+                    value="dog"
+                    checked={form.animal === "dog"}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, animal: e.target.value }))
                     }
                     className="w-4 h-4 accent-white cursor-pointer"
                     disabled={isReadOnly}
+                    required
                   />
-                  <span>Cachorro</span>
+                  <span>{animalTypeMap.dog.label}</span>
                 </label>
 
                 <label
@@ -279,15 +338,16 @@ export const Modal: React.FC<ModalType> = ({
                   <input
                     type="radio"
                     name="animal"
-                    value="gato"
-                    checked={form.animal === "gato"}
+                    value="cat"
+                    checked={form.animal === "cat"}
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, animal: e.target.value }))
                     }
                     className="w-4 h-4 accent-white cursor-pointer"
                     disabled={isReadOnly}
+                    required
                   />
-                  <span>Gato</span>
+                  <span>{animalTypeMap.cat.label}</span>
                 </label>
               </div>
             </div>
@@ -337,6 +397,12 @@ export const Modal: React.FC<ModalType> = ({
               disabled={isReadOnly}
             />
           </div>
+
+          {error && (
+            <div className="mx-5 mb-4 bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
           {type === "Remove" && (
             <div className="flex justify-center text-white my-2">

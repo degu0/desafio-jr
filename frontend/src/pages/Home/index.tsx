@@ -16,7 +16,7 @@ type Pet = {
   name: string;
   race: string;
   birthDate: string;
-  typeAnimal: "cat" | "dog";
+  type: "CAT" | "DOG";
   owner: {
     id: string;
     name: string;
@@ -49,36 +49,42 @@ export function Home() {
     idPet: "",
   });
 
-  useEffect(() => {
-    async function fetchPets() {
-      try {
-        const response = await fetch("http://localhost:3000/pets", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error(`Erro ao buscar os animais`);
+  const fetchPets = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/pets", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error(`Erro ao buscar os animais`);
 
-        const data = await response.json();
-        setPets(data);
-      } catch (error) {
-        console.error("Erro ao buscar pets:", error);
-        if (error instanceof Error && error.message.includes("401")) {
-          navigate("/login");
-        }
-      } finally {
-        setIsLoading(false);
+      const data = await response.json();
+      setPets(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Erro ao buscar pets:", error);
+      if (error instanceof Error && error.message.includes("401")) {
+        navigate("/login");
       }
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     if (token) {
       fetchPets();
     } else {
       navigate("/login");
     }
-  }, [token, navigate]);
+  }, []);
+
+  const handleRefreshPets = () => {
+    fetchPets();
+    setCurrentPage(1);
+  };
 
   const filteredPets = pets.filter((pet) => {
     if (!searchTerm) return true;
@@ -158,7 +164,7 @@ export function Home() {
           currentPets.map((pet) => (
             <Item
               key={pet.id}
-              typeAnimal={pet.typeAnimal}
+              typeAnimal={pet.type}
               petName={pet.name}
               ownerName={pet.owner.name}
               petRace={pet.race}
@@ -221,6 +227,7 @@ export function Home() {
         onClose={() =>
           setModalRegisterConfig({ ...modalRegisterConfig, isOpen: false })
         }
+        onSuccess={handleRefreshPets}
       />
       <Modal
         type={modalEditConfig.type}
@@ -228,6 +235,7 @@ export function Home() {
         onClose={() =>
           setModalEditConfig({ ...modalEditConfig, isOpen: false })
         }
+        onSuccess={handleRefreshPets}
         idPet={modalEditConfig.idPet}
       />
       <Modal
@@ -236,6 +244,7 @@ export function Home() {
         onClose={() =>
           setModalRemoveConfig({ ...modalRemoveConfig, isOpen: false })
         }
+        onSuccess={handleRefreshPets}
         idPet={modalRemoveConfig.idPet}
       />
     </div>
