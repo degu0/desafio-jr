@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Item } from "../../components/Item";
 import { Modal } from "../../components/Modal";
 import { MdLogout } from "react-icons/md";
@@ -11,9 +11,25 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+type Pet = {
+  id: string;
+  name: string;
+  race: string;
+  birthDate: string;
+  typeAnimal: "cat" | "dog";
+  owner: {
+    id: string;
+    name: string;
+    telefone: string;
+  };
+};
+
 export function Home() {
+  const token = localStorage.getItem("@softpet:token");
+  const [pets, setPets] = useState<Pet[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -31,133 +47,43 @@ export function Home() {
     type: "Remove" as "Edit" | "Remove" | "Register",
   });
 
-  const pets = [
-    {
-      typeAnimal: "cat" as const,
-      petName: "Simba Farias",
-      ownerName: "Emmanuel Farias",
-      petRace: "Persa",
-      ownerTelefone: "81982402134",
-      petDateOfBirth: new Date("2022-08-22"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Thor Silva",
-      ownerName: "Maria Silva",
-      petRace: "Golden Retriever",
-      ownerTelefone: "81987654321",
-      petDateOfBirth: new Date("2020-03-15"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Mia Oliveira",
-      ownerName: "João Oliveira",
-      petRace: "Siamês",
-      ownerTelefone: "81976543210",
-      petDateOfBirth: new Date("2021-11-10"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Bella Santos",
-      ownerName: "Ana Santos",
-      petRace: "Poodle",
-      ownerTelefone: "81965432109",
-      petDateOfBirth: new Date("2019-06-25"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Luna Costa",
-      ownerName: "Pedro Costa",
-      petRace: "Maine Coon",
-      ownerTelefone: "81954321098",
-      petDateOfBirth: new Date("2023-01-18"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Max Ferreira",
-      ownerName: "Carla Ferreira",
-      petRace: "Bulldog Francês",
-      ownerTelefone: "81943210987",
-      petDateOfBirth: new Date("2021-09-05"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Nina Almeida",
-      ownerName: "Rafael Almeida",
-      petRace: "Ragdoll",
-      ownerTelefone: "81932109876",
-      petDateOfBirth: new Date("2022-04-12"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Zeus Rodrigues",
-      ownerName: "Juliana Rodrigues",
-      petRace: "Pastor Alemão",
-      ownerTelefone: "81921098765",
-      petDateOfBirth: new Date("2018-12-30"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Mel Souza",
-      ownerName: "Lucas Souza",
-      petRace: "Sphynx",
-      ownerTelefone: "81910987654",
-      petDateOfBirth: new Date("2020-07-22"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Apolo Martins",
-      ownerName: "Beatriz Martins",
-      petRace: "Husky Siberiano",
-      ownerTelefone: "81909876543",
-      petDateOfBirth: new Date("2021-02-14"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Chloe Lima",
-      ownerName: "Gabriel Lima",
-      petRace: "British Shorthair",
-      ownerTelefone: "81898765432",
-      petDateOfBirth: new Date("2022-10-08"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Rex Barbosa",
-      ownerName: "Fernanda Barbosa",
-      petRace: "Rottweiler",
-      ownerTelefone: "81887654321",
-      petDateOfBirth: new Date("2019-05-20"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Princesa Gomes",
-      ownerName: "Ricardo Gomes",
-      petRace: "Angorá",
-      ownerTelefone: "81876543210",
-      petDateOfBirth: new Date("2023-03-12"),
-    },
-    {
-      typeAnimal: "dog" as const,
-      petName: "Bob Cardoso",
-      ownerName: "Camila Cardoso",
-      petRace: "Beagle",
-      ownerTelefone: "81865432109",
-      petDateOfBirth: new Date("2020-11-25"),
-    },
-    {
-      typeAnimal: "cat" as const,
-      petName: "Mingau Rocha",
-      ownerName: "Daniel Rocha",
-      petRace: "Vira-lata",
-      ownerTelefone: "81854321098",
-      petDateOfBirth: new Date("2021-07-30"),
-    },
-  ];
+  useEffect(() => {
+    async function fetchPets() {
+      try {
+        const response = await fetch("http://localhost:3000/pets", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error(`Erro ao buscar os animais`);
+
+        const data = await response.json();
+        setPets(data);
+      } catch (error) {
+        console.error("Erro ao buscar pets:", error);
+        if (error instanceof Error && error.message.includes("401")) {
+          navigate("/login");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (token) {
+      fetchPets();
+    } else {
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
   const filteredPets = pets.filter((pet) => {
+    if (!searchTerm) return true;
+
     const searchLower = searchTerm.toLowerCase();
-    const petNameMatch = pet.petName.toLowerCase().includes(searchLower);
-    const ownerNameMatch = pet.ownerName
+    const petNameMatch = pet.name.toLowerCase().includes(searchLower);
+    const ownerNameMatch = pet.owner.name
       .toLocaleLowerCase()
       .includes(searchLower);
 
@@ -185,8 +111,16 @@ export function Home() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login')
+    navigate("/login");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D]">
+        <p className="text-white text-2xl">Carregando pets...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8 min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D] p-12">
@@ -217,15 +151,15 @@ export function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {currentPets.length > 0 ? (
-          currentPets.map((pet, index) => (
+          currentPets.map((pet) => (
             <Item
-              key={index}
+              key={pet.id} 
               typeAnimal={pet.typeAnimal}
-              petName={pet.petName}
-              ownerName={pet.ownerName}
-              petRace={pet.petRace}
-              ownerTelefone={pet.ownerTelefone}
-              petDateOfBirth={pet.petDateOfBirth}
+              petName={pet.name} 
+              ownerName={pet.owner.name} 
+              petRace={pet.race} 
+              ownerTelefone={pet.owner.telefone} 
+              petDateOfBirth={new Date(pet.birthDate)}
               onEdit={() =>
                 setModalEditConfig({ ...modalEditConfig, isOpen: true })
               }
