@@ -10,6 +10,7 @@ import {
   formatAnimalTypeForBackend,
   formatAnimalTypeFromBackend,
 } from "../utils/translations";
+import { maskPhone } from "../utils/masks";
 
 type ModalType = {
   type: "Edit" | "Remove" | "Register";
@@ -69,7 +70,6 @@ export const Modal: React.FC<ModalType> = ({
         if (!response.ok) throw new Error(`Erro ao buscar o animal`);
 
         const data = await response.json();
-        console.log(data);
         
         setForm({
           petName: data.name || "",
@@ -196,9 +196,6 @@ export const Modal: React.FC<ModalType> = ({
       if (!responsePet.ok) {
         throw new Error("Erro ao cadastrar pet");
       }
-
-      const dataPet = await responsePet.json();
-      console.log(dataPet);
     } catch (error) {
       throw error;
     }
@@ -238,9 +235,6 @@ export const Modal: React.FC<ModalType> = ({
       if (!responsePet.ok) {
         throw new Error("Erro ao atualizar pet");
       }
-
-      const dataPet = await responsePet.json();
-      console.log(dataPet);
     } catch (error) {
       console.error("Erro ao atualizar o pet:", error);
     }
@@ -259,10 +253,6 @@ export const Modal: React.FC<ModalType> = ({
       if (!responsePet.ok) {
         throw new Error("Erro ao deletar pet");
       }
-
-      const dataPet = await responsePet.json();
-
-      console.log(dataPet);
     } catch (error) {
       console.error("Erro ao deletar o pet:", error);
     }
@@ -380,7 +370,7 @@ export const Modal: React.FC<ModalType> = ({
               name="phone"
               value={form.phone}
               onChange={(value) =>
-                setForm((prev) => ({ ...prev, phone: value }))
+                setForm((prev) => ({ ...prev, phone: maskPhone(value) }))
               }
               disabled={isReadOnly}
             />

@@ -15,7 +15,7 @@ type Pet = {
   id: string;
   name: string;
   race: string;
-  birthDate: string;
+  dateOfBirth: string;
   type: "CAT" | "DOG";
   owner: {
     id: string;
@@ -62,7 +62,6 @@ export function Home() {
 
       const data = await response.json();
       setPets(data);
-      console.log(data);
     } catch (error) {
       console.error("Erro ao buscar pets:", error);
       if (error instanceof Error && error.message.includes("401")) {
@@ -169,7 +168,7 @@ export function Home() {
               ownerName={pet.owner.name}
               petRace={pet.race}
               ownerTelefone={pet.owner.telefone}
-              petDateOfBirth={new Date(pet.birthDate)}
+              petDateOfBirth={new Date(pet.dateOfBirth)}
               onEdit={() =>
                 setModalEditConfig({
                   ...modalEditConfig,
