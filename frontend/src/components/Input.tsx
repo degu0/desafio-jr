@@ -1,4 +1,4 @@
-import coleira from "../../../public/coleira.png";
+import coleira from "../../public/coleira.png";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { FaDna } from "react-icons/fa";
 import { BsTelephoneInbound } from "react-icons/bs";

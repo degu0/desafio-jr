@@ -1,9 +1,9 @@
 import type React from "react";
 import { useState } from "react";
 
-import cat from "../../../public/cat_icon.png";
-import dog from "../../../public/dog_icon.png";
-import coleira from "../../../public/coleira.png";
+import cat from "../../public/cat_icon.png";
+import dog from "../../public/dog_icon.png";
+import coleira from "../../public/coleira.png";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdDelete } from "react-icons/md";

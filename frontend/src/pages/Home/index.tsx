@@ -9,10 +9,13 @@ import {
   IoArrowForwardCircleOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const [modalRegisterConfig, setModalRegisterConfig] = useState({
@@ -180,11 +183,16 @@ export function Home() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login')
+  };
+
   return (
     <div className="flex flex-col gap-8 min-h-screen bg-gradient-to-tr from-[#0E0014] to-[#001E4D] p-12">
       <div className="flex items-center justify-between text-white text-3xl">
         <h1>SoftPet</h1>
-        <button onClick={() => navigate("/login")}>
+        <button onClick={() => handleLogout()} className="cursor-pointer">
           <MdLogout />
         </button>
       </div>

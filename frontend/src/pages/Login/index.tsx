@@ -1,16 +1,30 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login:", { username, password });
-    navigate("/");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      await login(email, password);
+      navigate('/')
+    } catch (error) {
+      setError("Usuário ou senha inválidos!");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,16 +41,17 @@ export function Login() {
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
               <FaUser className="text-blue-400 text-lg" />
-              <span className="font-medium">Usuário</span>
+              <span className="font-medium">Email</span>
             </label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Digite seu nome de usuário"
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -52,8 +67,15 @@ export function Login() {
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
+              disabled={isLoading}
             />
           </div>
+
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
@@ -65,7 +87,10 @@ export function Login() {
 
           <div className="text-center text-gray-400 text-sm mt-2">
             Não tem uma conta?{" "}
-            <a href="/Cadastro" className="text-blue-400 hover:text-blue-300 transition-colors">
+            <a
+              href="/Cadastro"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
               Cadastre-se
             </a>
           </div>

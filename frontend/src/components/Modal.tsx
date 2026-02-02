@@ -3,7 +3,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { MdDelete, MdPersonAdd } from "react-icons/md";
-import { Input } from "../Input";
+import { Input } from "./Input";
 
 type ModalType = {
   type: "Edit" | "Remove" | "Register";

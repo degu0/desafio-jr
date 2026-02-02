@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function Register() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -21,7 +28,16 @@ export function Register() {
       return;
     }
 
-    console.log("Cadastro:", { username, password });
+    setIsLoading(true);
+
+    try {
+      await register(username, email, password);
+      navigate("/");
+    } catch (error) {
+      setError("Erro ao criar conta. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -32,14 +48,16 @@ export function Register() {
       >
         <div className="text-center mb-4">
           <h1 className="text-white text-4xl font-bold mb-2">SoftPet</h1>
-          <p className="text-gray-400 text-sm">Faça o cadastro para continuar</p>
+          <p className="text-gray-400 text-sm">
+            Faça o cadastro para continuar
+          </p>
         </div>
 
         <form onSubmit={handleRegister} className="flex flex-col gap-5">
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
               <FaUser className="text-blue-400 text-lg" />
-              <span className="font-medium">Usuário</span>
+              <span className="font-medium">Nome do usuário</span>
             </label>
             <input
               type="text"
@@ -50,6 +68,25 @@ export function Register() {
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
               minLength={3}
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-white mb-2">
+              <FaUser className="text-blue-400 text-lg" />
+              <span className="font-medium">Email</span>
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Digite seu nome de usuário"
+              className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
+                text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
+              required
+              minLength={3}
+              disabled={isLoading}
             />
           </div>
 
@@ -67,6 +104,7 @@ export function Register() {
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
               required
               minLength={6}
+              disabled={isLoading}
             />
           </div>
 
@@ -85,6 +123,7 @@ export function Register() {
               } focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500`}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -97,14 +136,17 @@ export function Register() {
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
-              rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2"
+              rounded-lg hover:opacity-90 transition-opacity duration-200 mt-2 cursor-pointer"
           >
             Cadastrar
           </button>
 
           <div className="text-center text-gray-400 text-sm mt-2">
             Já tem uma conta?{" "}
-            <a href="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
+            <a
+              href="/login"
+              className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+            >
               Faça login
             </a>
           </div>
