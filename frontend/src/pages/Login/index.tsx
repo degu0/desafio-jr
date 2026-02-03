@@ -1,30 +1,25 @@
-import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useForm } from "react-hook-form";
+import { type LoginFormData, loginSchema } from "../../schemas/authSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(email, password);
-      navigate('/')
-    } catch (error) {
-      setError("Usuário ou senha inválidos!");
-    } finally {
-      setIsLoading(false);
-    }
+      await login(data.email, data.password);
+      navigate("/");
+    } catch (error) {}
   };
 
   return (
@@ -37,22 +32,25 @@ export function Login() {
           <h1 className="text-white text-4xl font-bold mb-2">SoftPet</h1>
           <p className="text-gray-400 text-sm">Faça login para continuar</p>
         </div>
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
               <FaUser className="text-blue-400 text-lg" />
               <span className="font-medium">Email</span>
             </label>
             <input
+              {...register("email")}
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               placeholder="Digite seu nome de usuário"
+              disabled={isSubmitting}
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
-              required
-              disabled={isLoading}
             />
+            {errors.email && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div>
             <label className="flex items-center gap-2 text-white mb-2">
@@ -60,23 +58,19 @@ export function Login() {
               <span className="font-medium">Senha</span>
             </label>
             <input
+              {...register("password")}
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Digite sua senha"
+              disabled={isSubmitting}
               className="w-full bg-slate-900/50 border-2 border-gray-700 focus:border-blue-500 focus:outline-none 
                 text-white rounded-lg px-4 py-3 transition-colors placeholder:text-gray-500"
-              required
-              disabled={isLoading}
             />
+            {errors.password && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
-
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-
           <button
             type="submit"
             className="w-full bg-linear-to-r from-[#00CAFC] to-[#0056E2] text-white font-semibold py-3 
